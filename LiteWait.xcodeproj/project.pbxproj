@@ -9,11 +9,16 @@
 /* Begin PBXBuildFile section */
 		6503932F1B60005600398DEA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6503932E1B60005600398DEA /* AppDelegate.swift */; };
 		650393321B60005600398DEA /* LiteWait.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 650393301B60005600398DEA /* LiteWait.xcdatamodeld */; };
-		650393341B60005600398DEA /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650393331B60005600398DEA /* ViewController.swift */; };
 		650393371B60005600398DEA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 650393351B60005600398DEA /* Main.storyboard */; };
 		650393391B60005600398DEA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 650393381B60005600398DEA /* Images.xcassets */; };
 		6503933C1B60005600398DEA /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6503933A1B60005600398DEA /* LaunchScreen.xib */; };
 		650393481B60005600398DEA /* LiteWaitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650393471B60005600398DEA /* LiteWaitTests.swift */; };
+		650393561B60094C00398DEA /* WaitlistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650393551B60094C00398DEA /* WaitlistViewController.swift */; };
+		650393581B600AC900398DEA /* WaitListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650393571B600AC900398DEA /* WaitListTableViewCell.swift */; };
+		6503935A1B60384900398DEA /* EditEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650393591B60384900398DEA /* EditEntryViewController.swift */; };
+		658167AB1B62A2BD00E67D14 /* WaitlistEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 658167AA1B62A2BD00E67D14 /* WaitlistEntry.swift */; };
+		65A705711B617BE500406810 /* Waitlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A705701B617BE500406810 /* Waitlist.swift */; };
+		65B9D7FD1B618D5F00F0F50E /* AddEntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B9D7FC1B618D5F00F0F50E /* AddEntryViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,13 +36,18 @@
 		6503932D1B60005600398DEA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6503932E1B60005600398DEA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		650393311B60005600398DEA /* LiteWait.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = LiteWait.xcdatamodel; sourceTree = "<group>"; };
-		650393331B60005600398DEA /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		650393361B60005600398DEA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		650393381B60005600398DEA /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6503933B1B60005600398DEA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		650393411B60005600398DEA /* LiteWaitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LiteWaitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		650393461B60005600398DEA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		650393471B60005600398DEA /* LiteWaitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiteWaitTests.swift; sourceTree = "<group>"; };
+		650393551B60094C00398DEA /* WaitlistViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistViewController.swift; sourceTree = "<group>"; };
+		650393571B600AC900398DEA /* WaitListTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitListTableViewCell.swift; sourceTree = "<group>"; };
+		650393591B60384900398DEA /* EditEntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditEntryViewController.swift; sourceTree = "<group>"; };
+		658167AA1B62A2BD00E67D14 /* WaitlistEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WaitlistEntry.swift; sourceTree = "<group>"; };
+		65A705701B617BE500406810 /* Waitlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Waitlist.swift; sourceTree = "<group>"; };
+		65B9D7FC1B618D5F00F0F50E /* AddEntryViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddEntryViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,9 +89,14 @@
 		6503932B1B60005600398DEA /* LiteWait */ = {
 			isa = PBXGroup;
 			children = (
+				658167AA1B62A2BD00E67D14 /* WaitlistEntry.swift */,
+				65A705701B617BE500406810 /* Waitlist.swift */,
+				650393591B60384900398DEA /* EditEntryViewController.swift */,
 				6503932E1B60005600398DEA /* AppDelegate.swift */,
-				650393331B60005600398DEA /* ViewController.swift */,
+				650393551B60094C00398DEA /* WaitlistViewController.swift */,
 				650393351B60005600398DEA /* Main.storyboard */,
+				65B9D7FC1B618D5F00F0F50E /* AddEntryViewController.swift */,
+				650393571B600AC900398DEA /* WaitListTableViewCell.swift */,
 				650393381B60005600398DEA /* Images.xcassets */,
 				6503933A1B60005600398DEA /* LaunchScreen.xib */,
 				650393301B60005600398DEA /* LiteWait.xcdatamodeld */,
@@ -164,6 +179,7 @@
 				TargetAttributes = {
 					650393281B60005600398DEA = {
 						CreatedOnToolsVersion = 6.2;
+						DevelopmentTeam = 4TM9WJERT3;
 					};
 					650393401B60005600398DEA = {
 						CreatedOnToolsVersion = 6.2;
@@ -215,9 +231,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				650393341B60005600398DEA /* ViewController.swift in Sources */,
+				6503935A1B60384900398DEA /* EditEntryViewController.swift in Sources */,
+				658167AB1B62A2BD00E67D14 /* WaitlistEntry.swift in Sources */,
+				65B9D7FD1B618D5F00F0F50E /* AddEntryViewController.swift in Sources */,
 				650393321B60005600398DEA /* LiteWait.xcdatamodeld in Sources */,
+				650393561B60094C00398DEA /* WaitlistViewController.swift in Sources */,
+				65A705711B617BE500406810 /* Waitlist.swift in Sources */,
 				6503932F1B60005600398DEA /* AppDelegate.swift in Sources */,
+				650393581B600AC900398DEA /* WaitListTableViewCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,9 +363,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = LiteWait/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -352,9 +377,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = LiteWait/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
@@ -411,6 +440,7 @@
 				6503934D1B60005600398DEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6503934E1B60005600398DEA /* Build configuration list for PBXNativeTarget "LiteWaitTests" */ = {
 			isa = XCConfigurationList;
@@ -419,6 +449,7 @@
 				650393501B60005600398DEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

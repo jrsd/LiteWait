@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model name="Test1.xcdatamodel" userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="1" systemVersion="11A491" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
-    <elements/>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14E46" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="EstimatedWaitTime" representedClassName="EstimatedWaitTime" syncable="YES">
+        <attribute name="waitTime" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+    </entity>
+    <entity name="WaitlistEntry" representedClassName="LiteWait.WaitlistEntry" syncable="YES">
+        <attribute name="adults" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="checkInTime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="emailAddress" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isCallIn" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="isCheckedIn" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="isNoShow" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="isRemoved" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="isReservation" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="isSeated" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="kids" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="noShowTime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="phoneNumber" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="quotedTime" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="seatedAtTime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="seatingPreference" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="totalGuests" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="EstimatedWaitTime" positionX="-45" positionY="117" width="128" height="60"/>
+        <element name="WaitlistEntry" positionX="-54" positionY="-9" width="128" height="315"/>
+    </elements>
 </model>
