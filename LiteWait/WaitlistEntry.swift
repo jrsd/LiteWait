@@ -35,6 +35,7 @@ class WaitlistEntry: NSManagedObject {
         isSeated = NSNumber(bool: true)
         isRemoved = NSNumber(bool: false)
         isNoShow = NSNumber(bool: false)
+        isCallIn = NSNumber(bool: false)
         seatedAtTime = NSDate()
     }
     
@@ -43,6 +44,7 @@ class WaitlistEntry: NSManagedObject {
         isSeated = NSNumber(bool: false)
         isRemoved = NSNumber(bool: false)
         isNoShow = NSNumber(bool: false)
+        isCallIn = NSNumber(bool: false)
     }
     
     func remove() {
@@ -50,6 +52,7 @@ class WaitlistEntry: NSManagedObject {
         isRemoved = NSNumber(bool: true)
         isNoShow = NSNumber(bool: false)
         isCheckedIn = NSNumber(bool: true)
+        isCallIn = NSNumber(bool: false)
         seatedAtTime = nil
     }
     
@@ -57,6 +60,7 @@ class WaitlistEntry: NSManagedObject {
         isSeated = NSNumber(bool: false)
         isRemoved = NSNumber(bool: false)
         isNoShow = NSNumber(bool: false)
+        isCallIn = NSNumber(bool: false)
         seatedAtTime = nil
     }
     

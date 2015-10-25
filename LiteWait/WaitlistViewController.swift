@@ -169,7 +169,7 @@ class WaitlistViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        self.performSegueWithIdentifier("editWaitlistEntry", sender: self)
+        //self.performSegueWithIdentifier("editWaitlistEntry", sender: self)
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
