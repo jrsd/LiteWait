@@ -47,7 +47,7 @@ class AddEntryViewController: UIViewController {
         quotedTimeStepper.value = 0
         seatingPreferenceControl.selectedSegmentIndex = 0
         
-        phoneNumberTextField.enabled = false
+        phoneNumberTextField.isEnabled = false
         
         if estimatedWaitTime != nil{
             quotedTimeStepper.value = estimatedWaitTime
@@ -66,21 +66,21 @@ class AddEntryViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func adultValueChanged(stepper: UIStepper) {
+    @IBAction func adultValueChanged(_ stepper: UIStepper) {
         adultTextField.text = "\(Int(stepper.value))"
     }
     
-    @IBAction func kidValueChanged(stepper: UIStepper) {
+    @IBAction func kidValueChanged(_ stepper: UIStepper) {
         kidTextField.text = "\(Int(stepper.value))"
     }
     
-    @IBAction func quotedTimeValueChanged(stepper: UIStepper) {
+    @IBAction func quotedTimeValueChanged(_ stepper: UIStepper) {
         quotedTimeTextField.text = getQuotedTime(stepper.value)
     }
     
-    func getQuotedTime(value: Double) -> String {
+    func getQuotedTime(_ value: Double) -> String {
         var timeString = ""
-        var number = Int(value)
+        let number = Int(value)
         
         if number < 60 {
             timeString = "\(number) Minutes"
@@ -93,29 +93,30 @@ class AddEntryViewController: UIViewController {
         return timeString
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any!) {
         if segue.identifier == "saveWaitlistEntry" {
-            var proceed = validateData()
+            let proceed = validateData()
             var errorString = ""
             
             //data is valid, create WaitlistEntry based on current values
             if proceed {
                 
-                if let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+                if let managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).managedObjectContext {
                     
-                    entry = NSEntityDescription.insertNewObjectForEntityForName("WaitlistEntry",
-                    inManagedObjectContext: managedObjectContext) as! WaitlistEntry
-                    entry.name = nameTextField.text
-                    entry.adults = Int(adultStepper.value)
-                    entry.kids = Int(kidStepper.value)
-                    entry.totalGuests = Int(adultStepper.value) + Int(kidStepper.value)
+                    entry = NSEntityDescription.insertNewObject(forEntityName: "WaitlistEntry",
+                    into: managedObjectContext) as! WaitlistEntry
+                    entry.name = nameTextField.text!
+                    entry.adults = NSNumber(value: adultStepper.value)
+                    entry.kids = NSNumber(value: kidStepper.value)
+                    let totalGuests = adultStepper.value + kidStepper.value
+                    entry.totalGuests = NSNumber(value: totalGuests)
                     entry.checkInTime = checkInTimePicker.date
-                    entry.quotedTime = Int(quotedTimeStepper.value)
+                    entry.quotedTime = NSNumber(value: quotedTimeStepper.value)
                     entry.seatingPreference = getSeatingPreference()
-                    entry.notes = notesTextField.text
-                    entry.isReservation = getReservation()
-                    entry.isCallIn = getCallIn().0
-                    entry.isCheckedIn = getCallIn().1
+                    entry.notes = notesTextField.text!
+                    entry.isReservation = getReservation() as NSNumber
+                    entry.isCallIn = getCallIn().0 as NSNumber
+                    entry.isCheckedIn = getCallIn().1 as NSNumber
                     entry.isSeated = false
                     entry.isRemoved = false
                     
@@ -127,14 +128,14 @@ class AddEntryViewController: UIViewController {
                         entry.emailAddress = emailAddressTextField.text
                     }
                     
-                    var e: NSError?
-                    if managedObjectContext.save(&e) != true {
-                        println("insert error: \(e!.localizedDescription)")
-                        return
+                    do {
+                        try managedObjectContext.save()
+                    } catch {
+                        print("Error")
                     }
                 }
                 
-                let destinationController = segue.destinationViewController as! WaitlistViewController
+                let destinationController = segue.destination as! WaitlistViewController
                 destinationController.waitlist.estimatedTime = Int(estimatedWaitTime)
                 
             } else {
@@ -143,10 +144,10 @@ class AddEntryViewController: UIViewController {
                     errorString += item + "\n"
                 }
                 
-                let alertController = UIAlertController(title: "Oops!", message: errorString, preferredStyle: .Alert)
-                let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                let alertController = UIAlertController(title: "Oops!", message: errorString, preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
                 alertController.addAction(okAction)
-                self.presentViewController(alertController, animated: true, completion: nil)
+                self.present(alertController, animated: true, completion: nil)
                 dataErrors = []
             }
         }
@@ -230,24 +231,24 @@ class AddEntryViewController: UIViewController {
         return isReservation
     }
         
-    @IBAction func cancelButtonPushed(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func cancelButtonPushed(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
     func validateEmail() -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}"
         let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
         
-        var isValid = emailTest.evaluateWithObject(emailAddressTextField.text)
+        let isValid = emailTest.evaluate(with: emailAddressTextField.text)
         
         return isValid
     }
     
     func validatePhoneNumber() -> Bool {
         let phoneRegEx = "^\\d{10}$"
-        var phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneRegEx)
+        let phoneTest = NSPredicate(format: "SELF MATCHES %@", phoneRegEx)
         
-        var isValid =  phoneTest.evaluateWithObject(phoneNumberTextField.text)
+        let isValid =  phoneTest.evaluate(with: phoneNumberTextField.text)
         
         return isValid
     }

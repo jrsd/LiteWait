@@ -36,7 +36,9 @@ class EditEntryViewController: UIViewController, MFMailComposeViewControllerDele
     var guestIndex: Int!
     var dataErrors: [String]!
     var estimatedWaitTime: Double!
-
+    
+    var waitlistState: WaitlistModes!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -50,13 +52,13 @@ class EditEntryViewController: UIViewController, MFMailComposeViewControllerDele
         kidTextField.text = "\(guest.kids)"
         quotedTimeTextField.text = guest.getQuotedTime()
         notesTextField.text = guest.notes
-        seatedAtTextField.enabled = false
+        seatedAtTextField.isEnabled = false
         
         adultStepper.value = Double(guest.adults)
         kidStepper.value = Double(guest.kids)
         quotedTimeStepper.value = Double(guest.quotedTime)
         
-        checkInTimePicker.date = guest.checkInTime
+        checkInTimePicker.date = guest.checkInTime as Date
         
         switch guest.seatingPreference {
         case "First Available":
@@ -78,26 +80,26 @@ class EditEntryViewController: UIViewController, MFMailComposeViewControllerDele
         dataErrors = []
         
         if guest.isSeated == true || guest.isRemoved == true {
-            nameTextField.enabled = false
-            notesTextField.enabled = false
-            adultStepper.enabled = false
-            kidStepper.enabled = false
-            quotedTimeStepper.enabled = false
-            checkInTimePicker.enabled = false
-            seatingPreferenceControl.enabled = false
-            partyTypeControl.enabled = false
-            removeButton.hidden = true
+            nameTextField.isEnabled = false
+            notesTextField.isEnabled = false
+            adultStepper.isEnabled = false
+            kidStepper.isEnabled = false
+            quotedTimeStepper.isEnabled = false
+            checkInTimePicker.isEnabled = false
+            seatingPreferenceControl.isEnabled = false
+            partyTypeControl.isEnabled = false
+            removeButton.isHidden = true
         }
         
         if guest.seatedAtTime == nil {
-            seatedAtLabel.hidden = true
-            seatedAtTextField.hidden = true
+            seatedAtLabel.isHidden = true
+            seatedAtTextField.isHidden = true
         } else {
             seatedAtTextField.text = guest.getSeatedTime()
         }
         
         if guest.phoneNumber == nil && guest.emailAddress == nil {
-            messageButton.hidden = true
+            messageButton.isHidden = true
         }
         
     }
@@ -107,30 +109,32 @@ class EditEntryViewController: UIViewController, MFMailComposeViewControllerDele
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func nameValueChanged(text: UITextField) {
-        guest.name = text.text
+    @IBAction func nameValueChanged(_ text: UITextField) {
+        guest.name = text.text!
     }
     
-    @IBAction func notesValueChanged(text: UITextField) {
-        guest.notes = text.text
+    @IBAction func notesValueChanged(_ text: UITextField) {
+        guest.notes = text.text!
     }
     
     @IBAction func adultValueChanged(stepper: UIStepper) {
-        var value = stepper.value
-        guest.adults = Int(value)
-        guest.totalGuests = guest.adults.integerValue + guest.kids.integerValue
-        adultTextField.text = "\(guest.adults.integerValue)"
+        let num = stepper.value
+        guest.adults = NSNumber(value: num)
+        let totalGuests = guest.adults.intValue + guest.kids.intValue
+        guest.totalGuests = NSNumber(value: totalGuests)
+        adultTextField.text = "\(guest.adults.intValue)"
     }
     
     @IBAction func kidValueChanged(stepper: UIStepper) {
-        var value = stepper.value
-        guest.kids = Int(value)
-        guest.totalGuests = guest.adults.integerValue + guest.kids.integerValue
-        kidTextField.text = "\(guest.kids.integerValue)"
+        let num = stepper.value
+        guest.kids = NSNumber(value: num)
+        let totalGuests = guest.adults.intValue + guest.kids.intValue
+        guest.totalGuests = NSNumber(value: totalGuests)
+        kidTextField.text = "\(guest.kids.intValue)"
     }
     
-    @IBAction func seatingPreferenceChanges(preference: UISegmentedControl) {
-        var value = preference.selectedSegmentIndex
+    @IBAction func seatingPreferenceChanges(_ preference: UISegmentedControl) {
+        let value = preference.selectedSegmentIndex
         
         switch value {
         case 0:
@@ -144,118 +148,120 @@ class EditEntryViewController: UIViewController, MFMailComposeViewControllerDele
     }
     
     @IBAction func quotedTimeValueChanged(stepper: UIStepper) {
-        var value = stepper.value
-        guest.quotedTime = Int(value)
+        let value = stepper.value
+        guest.quotedTime = NSNumber(value: value)
         quotedTimeTextField.text = guest.getQuotedTime()
     }
     
-    @IBAction func checkInTimeValueChanged(picker: UIDatePicker) {
-        var date = picker.date
+    @IBAction func checkInTimeValueChanged(_ picker: UIDatePicker) {
+        let date = picker.date
         guest.checkInTime = date
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any!) {
         if segue.identifier == "saveWaitlistEntry" {
-            var proceed = validateData()
+            let proceed = validateData()
             var errorString = ""
+            let adults = adultStepper.value
+            let kids = kidStepper.value
+            let quotedTime = quotedTimeStepper.value
             if proceed {
-                self.guest.name = nameTextField.text
-                self.guest.adults = Int(adultStepper.value)
-                self.guest.kids = Int(kidStepper.value)
+                self.guest.name = nameTextField.text!
+                self.guest.adults = NSNumber(value: adults)
+                self.guest.kids = NSNumber(value: kids)
                 self.guest.checkInTime = checkInTimePicker.date
-                self.guest.quotedTime = Int(quotedTimeStepper.value)
+                self.guest.quotedTime = NSNumber(value: quotedTime)
                 self.guest.seatingPreference = getSeatingPreference()
-                self.guest.notes = notesTextField.text
-                self.guest.isReservation = getReservation()
-                self.guest.isCallIn = getCallIn()
-                if self.guest.isCallIn == true {
-                    self.guest.isCheckedIn = false
-                } else {
-                    self.guest.isCheckedIn = true
-                }
-                            
-                let destinationController = segue.destinationViewController as! WaitlistViewController
+                self.guest.notes = notesTextField.text!
+                self.guest.isReservation = getReservation() as NSNumber
+                self.guest.isCallIn = getCallIn() as NSNumber
+                self.guest.isCheckedIn = getCheckedIn() as NSNumber
+                
+                
+                    
+                let destinationController = segue.destination as! WaitlistViewController
                 destinationController.waitlist.estimatedTime = Int(estimatedWaitTime)
+                destinationController.waitlist.setMode(waitlistState)
             } else {
                 //Errors validating data, display alert for user with messages
                 for item in dataErrors {
                     errorString += item + "\n"
                 }
                 
-                let alertController = UIAlertController(title: "Error", message: errorString, preferredStyle: .Alert)
-                let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+                let alertController = UIAlertController(title: "Error", message: errorString, preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
                 alertController.addAction(okAction)
-                self.presentViewController(alertController, animated: true, completion: nil)
+                self.present(alertController, animated: true, completion: nil)
                 dataErrors = []
             }
         }
         
         if segue.identifier == "deleteWaitlistEntry" {
-            let destinationController = segue.destinationViewController as! WaitlistViewController
+            let destinationController = segue.destination as! WaitlistViewController
             destinationController.waitlist.estimatedTime = Int(estimatedWaitTime)
         }
     }
 
     
-    @IBAction func cancelButtonPushed(sender: AnyObject) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func cancelButtonPushed(_ sender: AnyObject) {
+        self.dismiss(animated: true, completion: nil)
     }
     
-    @IBAction func removeButtonPushed(sender: AnyObject) {
-        let alertController = UIAlertController(title: "Remove Entry?", message: "Are you sure you want to remove this entry?", preferredStyle: .Alert)
-        let okAction = UIAlertAction(title: "OK", style: .Default, handler: deleteEntry)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .Default, handler: nil)
+    @IBAction func removeButtonPushed(_ sender: AnyObject) {
+        let alertController = UIAlertController(title: "Remove Entry?", message: "Are you sure you want to remove this entry?", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: deleteEntry)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
         alertController.addAction(okAction)
         alertController.addAction(cancelAction)
-        self.presentViewController(alertController, animated: true, completion: nil)
+        self.present(alertController, animated: true, completion: nil)
     }
-    
-    @IBAction func messageButtonPushed(sender: AnyObject) {
-        let alertController = UIAlertController(title: "Message Guest", message: "How would you like to message this party?", preferredStyle: .Alert)
+
+//    @IBAction func messageButtonPushed(sender: AnyObject) {
+//        let alertController = UIAlertController(title: "Message Guest", message: "How would you like to message this party?", preferredStyle: .Alert)
         
-        let textAction = UIAlertAction(title: "Send Text", style: .Default, handler: nil)
-        let emailAction = UIAlertAction(title: "Email", style: .Default, handler: sendEmail)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .Default, handler: nil)
-        
+//        let textAction = UIAlertAction(title: "Send Text", style: .Default, handler: nil)
+//        let emailAction = UIAlertAction(title: "Email", style: .Default, handler: sendEmail)
+//        let cancelAction = UIAlertAction(title: "Cancel", style: .Default, handler: nil)
+//
 //        if let number = guest.phoneNumber {
 //            alertController.addAction(textAction)
 //        }
         
-        if let email = guest.emailAddress {
-            alertController.addAction(emailAction)
-        }
-        
-        alertController.addAction(cancelAction)
-        self.presentViewController(alertController, animated: true, completion: nil)
-    }
+//        if let email = guest.emailAddress {
+//            alertController.addAction(emailAction)
+//        }
+//        
+//        alertController.addAction(cancelAction)
+//        self.presentViewController(alertController, animated: true, completion: nil)
+//    }
+//
+//    func sendEmail(alert: UIAlertAction!) {
+//        //let address = [guest.emailAddress!]
+//        
+//        let emailController = MFMailComposeViewController()
+//        emailController.mailComposeDelegate = self
+//        emailController.setSubject("Your Table is Ready!")
+//        emailController.setMessageBody("Your table at Claire's on Cedros is ready!", isHTML: false)
+//        emailController.setToRecipients(["\(guest.emailAddress!)"])
+//        
+//        if MFMailComposeViewController.canSendMail() {
+//            self.presentViewController(emailController, animated: true, completion: nil)
+//        } else {
+//            print("Cannot send mail")
+//        }
+//    }
+//    
+//    func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
+//        controller.dismissViewControllerAnimated(true, completion: nil)
+//    }
+//    
+//    func sendTextMessage() {
+//        
+//    }
     
-    func sendEmail(alert: UIAlertAction!) {
-        //let address = [guest.emailAddress!]
-        
-        let emailController = MFMailComposeViewController()
-        emailController.mailComposeDelegate = self
-        emailController.setSubject("Your Table is Ready!")
-        emailController.setMessageBody("Your table at Claire's on Cedros is ready!", isHTML: false)
-        emailController.setToRecipients(["\(guest.emailAddress!)"])
-        
-        if MFMailComposeViewController.canSendMail() {
-            self.presentViewController(emailController, animated: true, completion: nil)
-        } else {
-            println("Cannot send mail")
-        }
-    }
-    
-    func mailComposeController(controller: MFMailComposeViewController!, didFinishWithResult result: MFMailComposeResult, error: NSError!) {
-        controller.dismissViewControllerAnimated(true, completion: nil)
-    }
-    
-    func sendTextMessage() {
-        
-    }
-    
-    func deleteEntry(alert: UIAlertAction!) {
+    func deleteEntry(_ alert: UIAlertAction!) {
         guest.remove()
-        performSegueWithIdentifier("deleteWaitlistEntry", sender: nil)
+        performSegue(withIdentifier: "deleteWaitlistEntry", sender: nil)
     }
     
     func validateData() -> Bool {
@@ -315,6 +321,10 @@ class EditEntryViewController: UIViewController, MFMailComposeViewControllerDele
     }
     
     func getCheckedIn() -> Bool {
-        return !self.guest.isCheckedIn.boolValue
+        if self.guest.isCallIn == true && self.guest.isCheckedIn == false {
+            return false
+        } else {
+            return true
+        }
     }
 }

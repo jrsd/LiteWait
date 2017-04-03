@@ -15,64 +15,64 @@ class WaitlistEntry: NSManagedObject {
     @NSManaged var name: String
     @NSManaged var kids: NSNumber
     @NSManaged var totalGuests: NSNumber
-    @NSManaged var checkInTime: NSDate
+    @NSManaged var checkInTime: Date
     @NSManaged var quotedTime: NSNumber
     @NSManaged var seatingPreference: String
     @NSManaged var notes: String
     @NSManaged var phoneNumber: String?
     @NSManaged var emailAddress: String?
     
-    @NSManaged var seatedAtTime: NSDate?
+    @NSManaged var seatedAtTime: Date?
     @NSManaged var isReservation: NSNumber
     @NSManaged var isCallIn: NSNumber
     @NSManaged var isCheckedIn: NSNumber
     @NSManaged var isSeated: NSNumber
     @NSManaged var isRemoved: NSNumber
     @NSManaged var isNoShow: NSNumber
-    @NSManaged var noShowTime: NSDate?
+    @NSManaged var noShowTime: Date?
     
     func seat() {
-        isSeated = NSNumber(bool: true)
-        isRemoved = NSNumber(bool: false)
-        isNoShow = NSNumber(bool: false)
-        isCallIn = NSNumber(bool: false)
-        seatedAtTime = NSDate()
+        isSeated = NSNumber(value: true as Bool)
+        isRemoved = NSNumber(value: false as Bool)
+        isNoShow = NSNumber(value: false as Bool)
+        //isCallIn = NSNumber(bool: false)
+        seatedAtTime = Date()
     }
     
     func activate() {
-        isCheckedIn = NSNumber(bool: true)
-        isSeated = NSNumber(bool: false)
-        isRemoved = NSNumber(bool: false)
-        isNoShow = NSNumber(bool: false)
-        isCallIn = NSNumber(bool: false)
+        isCheckedIn = NSNumber(value: true as Bool)
+        isSeated = NSNumber(value: false as Bool)
+        isRemoved = NSNumber(value: false as Bool)
+        isNoShow = NSNumber(value: false as Bool)
+        //isCallIn = NSNumber(bool: false)
     }
     
     func remove() {
-        isSeated = NSNumber(bool: false)
-        isRemoved = NSNumber(bool: true)
-        isNoShow = NSNumber(bool: false)
-        isCheckedIn = NSNumber(bool: true)
-        isCallIn = NSNumber(bool: false)
+        isSeated = NSNumber(value: false as Bool)
+        isRemoved = NSNumber(value: true as Bool)
+        isNoShow = NSNumber(value: false as Bool)
+        isCheckedIn = NSNumber(value: true as Bool)
+        //isCallIn = NSNumber(bool: false)
         seatedAtTime = nil
     }
     
     func unseat() {
-        isSeated = NSNumber(bool: false)
-        isRemoved = NSNumber(bool: false)
-        isNoShow = NSNumber(bool: false)
-        isCallIn = NSNumber(bool: false)
+        isSeated = NSNumber(value: false as Bool)
+        isRemoved = NSNumber(value: false as Bool)
+        isNoShow = NSNumber(value: false as Bool)
+        //isCallIn = NSNumber(bool: false)
         seatedAtTime = nil
     }
     
     func noShow() {
-        isNoShow = NSNumber(bool: true)
+        isNoShow = NSNumber(value: true as Bool)
     }
     
     func undelete() {
         unseat()
     }
     
-    func addNote(note: String) {
+    func addNote(_ note: String) {
         notes += "\n"
         notes += note
     }
@@ -80,7 +80,7 @@ class WaitlistEntry: NSManagedObject {
     func getCheckInTime() -> String {
         let formatter = dateFormatter()
         
-        let time = formatter.stringFromDate(self.checkInTime)
+        let time = formatter.string(from: self.checkInTime)
         
         return time
     }
@@ -89,7 +89,7 @@ class WaitlistEntry: NSManagedObject {
         let formatter = dateFormatter()
         
         if seatedAtTime != nil {
-            let time = formatter.stringFromDate(self.seatedAtTime!)
+            let time = formatter.string(from: self.seatedAtTime!)
             return time
         } else {
             return nil
@@ -101,12 +101,12 @@ class WaitlistEntry: NSManagedObject {
         
         if isReservation.boolValue {
             timeString = "Reservation"
-        } else if quotedTime.integerValue < 60 {
-            timeString = "\(quotedTime.integerValue) Minutes"
-        } else if quotedTime.integerValue == 60 {
+        } else if quotedTime.intValue < 60 {
+            timeString = "\(quotedTime.intValue) Minutes"
+        } else if quotedTime.intValue == 60 {
             timeString = "1 Hour"
         } else {
-            timeString = "1 Hour \(quotedTime.integerValue - 60) minutes"
+            timeString = "1 Hour \(quotedTime.intValue - 60) minutes"
         }
         
         return timeString
@@ -116,7 +116,7 @@ class WaitlistEntry: NSManagedObject {
         let formatter = dateFormatter()
         
         if noShowTime != nil {
-            let time = formatter.stringFromDate(self.noShowTime!)
+            let time = formatter.string(from: self.noShowTime!)
             return time
         } else {
             return nil
@@ -125,8 +125,8 @@ class WaitlistEntry: NSManagedObject {
     
     func getGuestNumberText() -> String {
         var text = ""
-        var adts = adults.integerValue
-        var kds = kids.integerValue
+        let adts = adults.intValue
+        let kds = kids.intValue
         
         if adts == 0 && kds == 1 {
             text = "\(kds) Child"
@@ -151,7 +151,7 @@ class WaitlistEntry: NSManagedObject {
     func getTotalWaitTime() -> Int? {
         if seatedAtTime != nil {
             //return difference in minutes (seconds/60)
-            let waitTime = seatedAtTime!.timeIntervalSinceDate(checkInTime)
+            let waitTime = seatedAtTime!.timeIntervalSince(checkInTime)
             return Int(round(waitTime / 60))
         } else {
             return nil
@@ -169,9 +169,9 @@ class WaitlistEntry: NSManagedObject {
         }
     }
     
-    func dateFormatter() -> NSDateFormatter {
-        let formatter = NSDateFormatter()
-        formatter.timeStyle = NSDateFormatterStyle.ShortStyle
+    func dateFormatter() -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.timeStyle = DateFormatter.Style.short
         formatter.dateFormat = "h:mm a"
         
         return formatter

@@ -25,16 +25,16 @@ class WaitlistViewController: UIViewController, UITableViewDataSource, UITableVi
     
     var waitlist = Waitlist()
     
-    var fetchResultController: NSFetchedResultsController!
+    var fetchResultController: NSFetchedResultsController<NSFetchRequestResult>!
         
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        UIApplication.sharedApplication().idleTimerDisabled = true
-        self.tableView.separatorStyle = UITableViewCellSeparatorStyle.SingleLine
+        UIApplication.shared.isIdleTimerDisabled = true
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyle.singleLine
         self.tableView.separatorColor = UIColor(red: 242/255, green: 242/255, blue: 242/255, alpha: 1)
         
-        UIApplication.sharedApplication().setStatusBarStyle(.LightContent, animated: true)
+        UIApplication.shared.setStatusBarStyle(.lightContent, animated: true)
         
         //round buttons
         newEntryButton.layer.cornerRadius = 10
@@ -44,27 +44,34 @@ class WaitlistViewController: UIViewController, UITableViewDataSource, UITableVi
         
         
         //fetch all waitlist entries in local store
-        var fetchRequest = NSFetchRequest(entityName: "WaitlistEntry")
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "WaitlistEntry")
         let sortKey = NSSortDescriptor(key: "checkInTime", ascending: true)
         fetchRequest.sortDescriptors = [sortKey]
         
-        if let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+        if let managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).managedObjectContext {
             fetchResultController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: managedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
             fetchResultController.delegate = self
             
             var e: NSError?
-            var result = fetchResultController.performFetch(&e)
-            var entrys = fetchResultController.fetchedObjects as! [WaitlistEntry]
+            var result: Bool
+            do {
+                try fetchResultController.performFetch()
+                result = true
+            } catch let error as NSError {
+                e = error
+                result = false
+            }
+            let entrys = fetchResultController.fetchedObjects as! [WaitlistEntry]
             
             //load all entries into waitlist for management
             for entry in entrys {
                 //compare if entry date (
-                let formatter = NSDateFormatter()
-                formatter.timeStyle = .NoStyle
-                formatter.dateStyle = .ShortStyle
-                let currentDate = NSDate()
+                let formatter = DateFormatter()
+                formatter.timeStyle = .none
+                formatter.dateStyle = .short
+                let currentDate = Date()
                 
-                if formatter.stringFromDate(entry.checkInTime) == formatter.stringFromDate(currentDate) {
+                if formatter.string(from: entry.checkInTime as Date) == formatter.string(from: currentDate) {
                     waitlist.addEntry(entry)
                 } else {
                     continue
@@ -72,7 +79,7 @@ class WaitlistViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             
             if result != true {
-                println(e?.localizedDescription)
+                print(e?.localizedDescription ?? "err")
             }
             
             waitTimeLabel.text = waitlist.getEstimatedTimeString()
@@ -86,17 +93,17 @@ class WaitlistViewController: UIViewController, UITableViewDataSource, UITableVi
         // Dispose of any resources that can be recreated.
     }
     
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return waitlist.getSize()
     }
         
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cellIdentifier = "WaitlistEntryCell"
-        let cell = tableView.dequeueReusableCellWithIdentifier(cellIdentifier, forIndexPath: indexPath) as! WaitListTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! WaitListTableViewCell
         
         if waitlist.getSize() != 0 {
-            var guest = waitlist.getEntry(indexPath.row)
-            cell.totalGuestLabel.text = "\(guest.totalGuests.integerValue)"
+            let guest = waitlist.getEntry(indexPath.row)
+            cell.totalGuestLabel.text = "\(guest.totalGuests.intValue)"
             cell.nameLabel.text = guest.name
             cell.guestNumberLabel.text = guest.getGuestNumberText()
             cell.checkInTimeLabel.text = guest.getCheckInTime()
@@ -104,7 +111,7 @@ class WaitlistViewController: UIViewController, UITableViewDataSource, UITableVi
             cell.seatingPreferenceLabel.text = guest.seatingPreference
             cell.seatingPreferenceImage.image = UIImage(named: guest.getSeatingImage())
             
-            if waitlist.getMode() == .Seated {
+            if waitlist.getMode() == .seated {
                 var labelText = "Waited \(guest.getTotalWaitTime()!) minutes"
                 if guest.notes != "" {
                     labelText += "\n\(guest.notes)"
@@ -115,7 +122,7 @@ class WaitlistViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             
             cell.totalGuestLabel.layer.cornerRadius = 20
-            cell.nameLabel.textColor = UIColor.blackColor()
+            cell.nameLabel.textColor = UIColor.black
             
             //darken color of totalGuestLabel based on size of party. Blue shades for walk in, green shades for call in
             switch guest.totalGuests {
@@ -154,49 +161,51 @@ class WaitlistViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             
             //if reservation, override total guest label color
-            if guest.isReservation == true && waitlist.getMode() == .Active{
+            if guest.isReservation == true && waitlist.getMode() == .active{
                 cell.totalGuestLabel.backgroundColor = UIColor(red: 255/255, green: 83/255, blue: 13/255, alpha: 1)
             }
             
-            if guest.isNoShow == true && waitlist.getMode() == .Active{
+            if guest.isNoShow == true && waitlist.getMode() == .active{
                 cell.nameLabel.textColor = UIColor(red: 255/255, green: 83/255, blue: 13/255, alpha: 1)
+                cell.notesLabel.textColor = UIColor(red: 255/255, green: 83/255, blue: 13/255, alpha: 1)
                 cell.notesLabel.text! += "\tNo Show!"
                 cell.notesLabel.text! += "\tCalled at \(guest.getNoShowTime()!)"
             }
+            
         }
         
         return cell
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //self.performSegueWithIdentifier("editWaitlistEntry", sender: self)
-        tableView.deselectRowAtIndexPath(indexPath, animated: true)
+        tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
     }
     
-    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         
         var seatPartyAction: UITableViewRowAction!
         var noShowPartyAction: UITableViewRowAction!
         
         switch waitlist.getMode() {
-        case .CallIn:
-            seatPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Check In",handler: rowSwipe)
-        case .Seated:
-            seatPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Unseat",handler: rowSwipe)
-        case .Removed:
-            seatPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Reactivate",handler: rowSwipe)
+        case .callIn:
+            seatPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.default, title: "Check In",handler: rowSwipe)
+        case .seated:
+            seatPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.default, title: "Unseat",handler: rowSwipe)
+        case .removed:
+            seatPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.default, title: "Reactivate",handler: rowSwipe)
         default:
-            seatPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Seat Party",handler: rowSwipe)
+            seatPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.default, title: "Seat Party",handler: rowSwipe)
             
             var noShowTitle = "No Show"
             if waitlist.getEntry(indexPath.row).isNoShow == true {
                 noShowTitle = "Showed Up"
             }
             
-            noShowPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: noShowTitle ,handler: noShow)
+            noShowPartyAction = UITableViewRowAction(style: UITableViewRowActionStyle.default, title: noShowTitle ,handler: noShow)
             seatPartyAction.backgroundColor = UIColor(red: 189/255, green: 212/255, blue: 222/255, alpha: 1)
             noShowPartyAction.backgroundColor = UIColor(red: 255/255, green: 83/255, blue: 13/255, alpha: 1)
             return [noShowPartyAction, seatPartyAction]
@@ -207,124 +216,129 @@ class WaitlistViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     //Handle swipe on row, all actions are similar and only very on current waitlist state
-    func rowSwipe(action: UITableViewRowAction!, indexPath: NSIndexPath!) {
-        if let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+    func rowSwipe(_ action: UITableViewRowAction!, indexPath: IndexPath!) {
+        if let managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).managedObjectContext {
             let entry = self.waitlist.getEntry(indexPath.row)
             
             switch waitlist.getMode(){
-            case .Active:
+            case .active:
                 entry.seat()
-            case .Seated:
-                let alertController = UIAlertController(title: "Activate Entry?", message: "Are you sure you want to activate this  entry and send it to the main waitlist?", preferredStyle: .Alert)
-                let okAction = UIAlertAction(title: "OK", style: .Default, handler: {(action: UIAlertAction!) in entry.unseat()
-                self.tableView.reloadData()})
-                let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+            case .seated:
+                let alertController = UIAlertController(title: "Activate Entry?", message: "Are you sure you want to activate this  entry and send it to the main waitlist?", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: {(action: UIAlertAction) in entry.unseat()
+                    self.activeListButtonPushed(action)})
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
                 alertController.addAction(okAction)
                 alertController.addAction(cancelAction)
-                self.presentViewController(alertController, animated: true, completion: nil)
-            case .CallIn:
+                self.present(alertController, animated: true, completion: nil)
+            case .callIn:
                 entry.activate()
+                waitlist.setMode(.active)
             default:
-                let alertController = UIAlertController(title: "Activate Entry?", message: "Are you sure you want to activate this  entry and send it to the main waitlist?", preferredStyle: .Alert)
-                let okAction = UIAlertAction(title: "OK", style: .Default, handler: {(action: UIAlertAction!) in entry.undelete()
-                self.tableView.reloadData()})
+                let alertController = UIAlertController(title: "Activate Entry?", message: "Are you sure you want to activate this  entry and send it to the main waitlist?", preferredStyle: .alert)
+                let okAction = UIAlertAction(title: "OK", style: .default, handler: {(action: UIAlertAction) in entry.undelete()
+                    self.activeListButtonPushed(action)})
                 
-                let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
                 alertController.addAction(okAction)
                 alertController.addAction(cancelAction)
-                self.presentViewController(alertController, animated: true, completion: nil)
-            }
-        
-            var e: NSError?
-            if managedObjectContext.save(&e) != true {
-                println("delete error: \(e!.localizedDescription)")
+                self.present(alertController, animated: true, completion: nil)
             }
             
-            dispatch_async(dispatch_get_main_queue(), {
+            do {
+                try managedObjectContext.save()
+            } catch {
+                print("Error")
+            }
+        
+            DispatchQueue.main.async(execute: {
                 
                 self.tableView.reloadData()
             })
             numberOfPartiesLabel.text = waitlist.getNumberOfActiveParties()
+            titleLabel.text = "Active List"
         }
     }
     
-    func noShow(action: UITableViewRowAction!, indexPath: NSIndexPath!) {
-        if let managedObjectContext = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+    func noShow(_ action: UITableViewRowAction!, indexPath: IndexPath!) {
+        if let managedObjectContext = (UIApplication.shared.delegate as! AppDelegate).managedObjectContext {
             let entry = self.waitlist.getEntry(indexPath.row)
             
-            entry.isNoShow = !entry.isNoShow.boolValue
+            entry.isNoShow = !entry.isNoShow.boolValue as NSNumber
             
             //create or delete no show time based on whether entry is active
-            if entry.isNoShow == true {
-                entry.noShowTime = NSDate()
+            if entry.isNoShow.boolValue == true {
+                entry.noShowTime = Date()
             } else {
                 entry.noShowTime = nil
             }
             
-            var e: NSError?
-            if managedObjectContext.save(&e) != true {
-                println("delete error: \(e!.localizedDescription)")
+            do {
+                try managedObjectContext.save()
+            } catch {
+                print("Error")
             }
             
-            dispatch_async(dispatch_get_main_queue(), {
+            DispatchQueue.main.async(execute: {
                 self.tableView.reloadData()
             })
         }
     }
 
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject!) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any!) {
         if segue.identifier == "editWaitlistEntry" {
             
-            if let indexPath = self.tableView.indexPathForSelectedRow(){
-                let destinationController = segue.destinationViewController as! EditEntryViewController
+            if let indexPath = self.tableView.indexPathForSelectedRow{
+                let destinationController = segue.destination as! EditEntryViewController
                 
                 destinationController.guest = waitlist.getEntry(indexPath.row)
                 destinationController.estimatedWaitTime = waitTimeStepper.value
+                destinationController.waitlistState = waitlist.getMode()
             }
         }
         
         if segue.identifier == "showAddWaitlistEntry" {
-            let destinationController = segue.destinationViewController as! AddEntryViewController
+            let destinationController = segue.destination as! AddEntryViewController
             destinationController.estimatedWaitTime = waitTimeStepper.value
         }
     }
     
-    @IBAction func activeListButtonPushed(sender: AnyObject) {
-        waitlist.setMode(.Active)
+    @IBAction func activeListButtonPushed(_ sender: AnyObject) {
+        waitlist.setMode(.active)
         reloadTable()
         titleLabel.text = "Active List"
         
     }
     
-    @IBAction func callInListButtonPushed(sender: AnyObject) {
-        waitlist.setMode(.CallIn)
+    @IBAction func callInListButtonPushed(_ sender: AnyObject) {
+        waitlist.setMode(.callIn)
         reloadTable()
         titleLabel.text = "Call-In List"
         
     }
     
-    @IBAction func seatedListButtonPushed(sender: AnyObject) {
-        waitlist.setMode(.Seated)
+    @IBAction func seatedListButtonPushed(_ sender: AnyObject) {
+        waitlist.setMode(.seated)
         reloadTable()
         titleLabel.text = "Seated List"
         
     }
     
-    @IBAction func deletedListButtonPushed(sender: AnyObject) {
-        waitlist.setMode(.Removed)
+    @IBAction func deletedListButtonPushed(_ sender: AnyObject) {
+        waitlist.setMode(.removed)
         reloadTable()
         titleLabel.text = "Deleted List"
 
     }
     
-    @IBAction func waitTimePickerDidChange(stepper: UIStepper) {
+    @IBAction func waitTimePickerDidChange(_ stepper: UIStepper) {
         waitlist.estimatedTime = Int(waitTimeStepper.value)
         waitTimeLabel.text = waitlist.getEstimatedTimeString()
     }
     
     func reloadTable() {
-        dispatch_async(dispatch_get_main_queue(), {
+        DispatchQueue.main.async(execute: {
             self.tableView.reloadData()
             self.numberOfPartiesLabel.text = self.waitlist.getNumberOfActiveParties()
             

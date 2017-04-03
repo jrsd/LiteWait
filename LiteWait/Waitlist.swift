@@ -9,7 +9,7 @@
 import Foundation
 
 enum WaitlistModes {
-    case Active, CallIn, Seated, Removed
+    case active, callIn, seated, removed
 }
 
 class Waitlist {
@@ -20,15 +20,15 @@ class Waitlist {
     
     init() {
         waitlist = []
-        mode = .Active
+        mode = .active
         estimatedTime = 0
     }
     
-    func addEntry(entry: WaitlistEntry) {
+    func addEntry(_ entry: WaitlistEntry) {
         waitlist.append(entry)
     }
     
-    func getEntry(index: Int) -> WaitlistEntry {
+    func getEntry(_ index: Int) -> WaitlistEntry {
         let currentList = fetchList()
         return currentList[index]
     }
@@ -38,15 +38,15 @@ class Waitlist {
         return currentList.count
     }
     
-    func remove(index: Int) {
-        waitlist.removeAtIndex(index)
+    func remove(_ index: Int) {
+        waitlist.remove(at: index)
     }
     
     func getCurrentList() -> [WaitlistEntry] {
         return fetchList()
     }
     
-    func setMode(setting: WaitlistModes) {
+    func setMode(_ setting: WaitlistModes) {
         mode = setting
     }
     
@@ -58,28 +58,28 @@ class Waitlist {
         var relatedEntries = [WaitlistEntry]()
         
         switch mode as WaitlistModes{
-        case .CallIn:
+        case .callIn:
             for entry in waitlist {
                 if entry.isCheckedIn == false {
                     relatedEntries.append(entry)
-                    relatedEntries.sort({$0.checkInTime.compare($1.checkInTime) == NSComparisonResult.OrderedAscending})
+                    relatedEntries.sort(by: {$0.checkInTime.compare($1.checkInTime as Date) == ComparisonResult.orderedAscending})
                 }
             }
         
-        case .Seated:
+        case .seated:
             for entry in waitlist {
                 if entry.isSeated == true {
                     relatedEntries.append(entry)
-                    relatedEntries.sort({$0.checkInTime.compare($1.checkInTime) == NSComparisonResult.OrderedDescending})
+                    relatedEntries.sort(by: {$0.checkInTime.compare($1.checkInTime as Date) == ComparisonResult.orderedDescending})
                     
                 }
             }
             
-        case .Removed:
+        case .removed:
             for entry in waitlist {
                 if entry.isRemoved == true {
                     relatedEntries.append(entry)
-                    relatedEntries.sort({$0.checkInTime.compare($1.checkInTime) == NSComparisonResult.OrderedDescending})
+                    relatedEntries.sort(by: {$0.checkInTime.compare($1.checkInTime as Date) == ComparisonResult.orderedDescending})
                 }
             }
             
@@ -91,11 +91,11 @@ class Waitlist {
                 }
             }
             for entry in waitlist {
-                if entry.isRemoved != true && entry.isSeated != true && !contains(relatedEntries, entry) && entry.isCheckedIn == true {
+                if entry.isRemoved != true && entry.isSeated != true && !relatedEntries.contains(entry) && entry.isCheckedIn == true {
                     relatedEntries.append(entry)
                 }
             }
-            relatedEntries.sort({$0.checkInTime.compare($1.checkInTime) == NSComparisonResult.OrderedAscending})
+            relatedEntries.sort(by: {$0.checkInTime.compare($1.checkInTime as Date) == ComparisonResult.orderedAscending})
             
         }
         
@@ -106,15 +106,15 @@ class Waitlist {
         var timeString = "Current Estimated Wait Time: "
         
         if estimatedTime < 60 {
-            timeString += "\(estimatedTime) Minutes"
+            timeString += "\(estimatedTime!) Minutes"
         } else if estimatedTime == 60 {
             timeString += "1 Hour"
         } else if estimatedTime > 60 && estimatedTime < 120{
-            timeString += "1 Hour \(estimatedTime - 60) minutes"
+            timeString += "1 Hour \(estimatedTime! - 60) minutes"
         } else if estimatedTime == 120 {
             timeString += "2 Hours"
         } else {
-            timeString += "2 Hours \(estimatedTime - 120) minutes"
+            timeString += "2 Hours \(estimatedTime! - 120) minutes"
         }
         
         return timeString
