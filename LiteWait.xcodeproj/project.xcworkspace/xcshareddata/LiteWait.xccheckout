@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>0A738566-E749-4FF5-B345-61B4BEDD1165</string>
+	<key>IDESourceControlProjectName</key>
+	<string>LiteWait</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>CAD12FA53C1F2B8995E32758CC9B00FE7BE49C15</key>
+		<string>bitbucket.org:solanabit/LiteWait.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>LiteWait.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>CAD12FA53C1F2B8995E32758CC9B00FE7BE49C15</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>bitbucket.org:solanabit/LiteWait.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>CAD12FA53C1F2B8995E32758CC9B00FE7BE49C15</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>CAD12FA53C1F2B8995E32758CC9B00FE7BE49C15</string>
+			<key>IDESourceControlWCCName</key>
+			<string>LiteWait</string>
+		</dict>
+	</array>
+</dict>
+</plist>

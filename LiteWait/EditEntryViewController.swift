@@ -117,7 +117,7 @@ class EditEntryViewController: UIViewController, MFMailComposeViewControllerDele
         guest.notes = text.text!
     }
     
-    @IBAction func adultValueChanged(stepper: UIStepper) {
+    @IBAction func adultValueChanged(_ stepper: UIStepper) {
         let num = stepper.value
         guest.adults = NSNumber(value: num)
         let totalGuests = guest.adults.intValue + guest.kids.intValue
@@ -125,7 +125,7 @@ class EditEntryViewController: UIViewController, MFMailComposeViewControllerDele
         adultTextField.text = "\(guest.adults.intValue)"
     }
     
-    @IBAction func kidValueChanged(stepper: UIStepper) {
+    @IBAction func kidValueChanged(_ stepper: UIStepper) {
         let num = stepper.value
         guest.kids = NSNumber(value: num)
         let totalGuests = guest.adults.intValue + guest.kids.intValue
@@ -147,7 +147,7 @@ class EditEntryViewController: UIViewController, MFMailComposeViewControllerDele
         
     }
     
-    @IBAction func quotedTimeValueChanged(stepper: UIStepper) {
+    @IBAction func quotedTimeValueChanged(_ stepper: UIStepper) {
         let value = stepper.value
         guest.quotedTime = NSNumber(value: value)
         quotedTimeTextField.text = guest.getQuotedTime()
